@@ -1,0 +1,25 @@
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tonic_build::configure()
+        .build_server(true)
+        .build_client(true)
+        .format(true)
+        .compile(
+            &[
+                "apis/proto/v1/payload/payload.proto",
+                "apis/proto/v1/vald/insert.proto",
+                "apis/proto/v1/vald/object.proto",
+                "apis/proto/v1/vald/remove.proto",
+                "apis/proto/v1/vald/search.proto",
+                "apis/proto/v1/vald/update.proto",
+                "apis/proto/v1/vald/upsert.proto",
+                "apis/proto/v1/agent/core/agent.proto",
+            ],
+            &[
+                ".",
+                "proto",
+                "proto/github.com/googleapis/googleapis",
+                "apis/proto",
+            ],
+        )?;
+    Ok(())
+}
