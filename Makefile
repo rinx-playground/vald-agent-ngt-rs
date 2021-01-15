@@ -4,7 +4,7 @@ REPO = vald-agent-ngt-rs
 
 VALD_DIR = vald
 VALD_REPO = vdaas/vald
-VALD_BRANCH = feature/apis/v1-new-design
+VALD_BRANCH = feature/apis-internal/change-grpc-bidirectional-stream-error-handling-and-api-interfaces
 VALD_DEPTH = 1
 
 DOCKER ?= docker

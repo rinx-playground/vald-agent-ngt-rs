@@ -43,6 +43,12 @@ pub mod core {
     }
 }
 
+pub mod errors {
+    pub mod v1 {
+        tonic::include_proto!("errors.v1");
+    }
+}
+
 pub mod payload {
     pub mod v1 {
         tonic::include_proto!("payload.v1");
@@ -98,7 +104,7 @@ impl Insert for ValdImpl {
         Ok(Response::new(reply))
     }
 
-    type StreamInsertStream = mpsc::Receiver<Result<payload::v1::object::Location, Status>>;
+    type StreamInsertStream = mpsc::Receiver<Result<payload::v1::object::StreamLocation, Status>>;
 
     async fn stream_insert(
         &self,
@@ -150,7 +156,7 @@ impl Search for ValdImpl {
         unimplemented!()
     }
 
-    type StreamSearchStream = mpsc::Receiver<Result<payload::v1::search::Response, Status>>;
+    type StreamSearchStream = mpsc::Receiver<Result<payload::v1::search::StreamResponse, Status>>;
 
     async fn stream_search(
         &self,
@@ -159,7 +165,7 @@ impl Search for ValdImpl {
         unimplemented!()
     }
 
-    type StreamSearchByIDStream = mpsc::Receiver<Result<payload::v1::search::Response, Status>>;
+    type StreamSearchByIDStream = mpsc::Receiver<Result<payload::v1::search::StreamResponse, Status>>;
 
     async fn stream_search_by_id(
         &self,
