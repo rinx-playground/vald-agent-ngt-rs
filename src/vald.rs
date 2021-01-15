@@ -87,21 +87,21 @@ impl Insert for ValdImpl {
             Some(o) => o,
             None => return Err(Status::invalid_argument("vector is required.")),
         };
-        let name = obj.id.clone();
+        let uuid = obj.id.clone();
         let vector = obj.vector.clone();
 
-        let uuid = match &self.ngt.lock().unwrap().insert(&name, vector){
-            Ok(oid) => oid.to_string(),
-            Err(err) => return Err(Status::internal(err.to_string())),
-        };
+        match &self.ngt.lock().unwrap().insert(&uuid, vector){
+            Ok(_) => {
+                let reply = payload::v1::object::Location{
+                    name: "vald-agent-ngt-rs".to_string(),
+                    uuid,
+                    ips: vec!["192.168.1.1".to_string()],
+                };
 
-        let reply = payload::v1::object::Location{
-            name,
-            uuid,
-            ips: vec!["192.168.1.1".to_string()],
-        };
-
-        Ok(Response::new(reply))
+                Ok(Response::new(reply))
+            },
+            Err(err) => Err(Status::internal(err.to_string())),
+        }
     }
 
     type StreamInsertStream = mpsc::Receiver<Result<payload::v1::object::StreamLocation, Status>>;

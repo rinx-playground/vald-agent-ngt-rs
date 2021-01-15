@@ -10,6 +10,9 @@ use super::vald::payload::v1::object::Distance;
 pub struct NGT {
     index: Option<Index>,
 
+    insert_vecs: Mutex<Vec<(String, Vec<f32>)>>,
+    delete_vecs: Mutex<Vec<String>>,
+
     id_oid: Mutex<HashMap<String, u32>>,
     oid_id: Mutex<HashMap<u32, String>>,
 
@@ -23,6 +26,8 @@ impl Default for NGT {
     fn default() -> Self {
         NGT {
             index: None,
+            insert_vecs: Mutex::new(Vec::new()),
+            delete_vecs: Mutex::new(Vec::new()),
             id_oid: Mutex::new(HashMap::new()),
             oid_id: Mutex::new(HashMap::new()),
             dimension: 784,
@@ -45,7 +50,7 @@ impl NGT {
         Ok(())
     }
 
-    pub fn insert(&mut self, id: &str, vec: Vec<f32>) -> Result<u32, io::Error> {
+    pub fn insert(&mut self, id: &str, vec: Vec<f32>) -> Result<(), io::Error> {
         let index = match &mut self.index {
             Some(index) => index,
             None => {
@@ -53,12 +58,12 @@ impl NGT {
             }
         };
 
-        let oid = index.insert(vec).unwrap();
+        self.insert_vecs
+            .lock()
+            .unwrap()
+            .push((id.to_string(), vec.clone()));
 
-        self.id_oid.lock().unwrap().insert(id.to_string(), oid);
-        self.oid_id.lock().unwrap().insert(oid, id.to_string());
-
-        Ok(oid)
+        Ok(())
     }
 
     pub fn search(
@@ -101,6 +106,23 @@ impl NGT {
                 panic!("NGT index is not opened");
             }
         };
+
+        let id_oid = &self.id_oid;
+        let oid_id = &self.oid_id;
+
+        let mut ivs = self.insert_vecs.lock().unwrap();
+
+        for _ in 0..ivs.len() {
+            let iv = match ivs.pop() {
+                Some(iv) => iv,
+                None => break,
+            };
+
+            let oid = index.insert(iv.1.clone()).unwrap();
+
+            id_oid.lock().unwrap().insert(iv.0.clone(), oid);
+            oid_id.lock().unwrap().insert(oid, iv.0.clone());
+        }
 
         index.build(1).unwrap();
 
