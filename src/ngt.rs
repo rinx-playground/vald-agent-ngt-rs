@@ -107,21 +107,23 @@ impl NGT {
             }
         };
 
-        let id_oid = &self.id_oid;
-        let oid_id = &self.oid_id;
+        {
+            let mut id_oid = self.id_oid.lock().unwrap();
+            let mut oid_id = self.oid_id.lock().unwrap();
 
-        let mut ivs = self.insert_vecs.lock().unwrap();
+            let mut ivs = self.insert_vecs.lock().unwrap();
 
-        for _ in 0..ivs.len() {
-            let iv = match ivs.pop() {
-                Some(iv) => iv,
-                None => break,
-            };
+            for _ in 0..ivs.len() {
+                let iv = match ivs.pop() {
+                    Some(iv) => iv,
+                    None => break,
+                };
 
-            let oid = index.insert(iv.1.clone()).unwrap();
+                let oid = index.insert(iv.1.clone()).unwrap();
 
-            id_oid.lock().unwrap().insert(iv.0.clone(), oid);
-            oid_id.lock().unwrap().insert(oid, iv.0.clone());
+                id_oid.insert(iv.0.clone(), oid);
+                oid_id.insert(oid, iv.0.clone());
+            }
         }
 
         index.build(1).unwrap();
