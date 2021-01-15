@@ -66,6 +66,31 @@ impl ValdImpl {
 
         Ok(())
     }
+
+    fn insert_impl(
+        &self,
+        request: &payload::v1::insert::Request,
+    ) -> Result<payload::v1::object::Location, Status> {
+        let obj = match &request.vector {
+            Some(o) => o,
+            None => return Err(Status::invalid_argument("vector is required.")),
+        };
+        let uuid = obj.id.clone();
+        let vector = obj.vector.clone();
+
+        match &self.ngt.lock().unwrap().insert(&uuid, vector){
+            Ok(_) => {
+                let reply = payload::v1::object::Location{
+                    name: "vald-agent-ngt-rs".to_string(),
+                    uuid,
+                    ips: vec!["192.168.1.1".to_string()],
+                };
+
+                Ok(reply)
+            },
+            Err(err) => Err(Status::internal(err.to_string())),
+        }
+    }
 }
 
 impl Clone for ValdImpl {
@@ -82,25 +107,9 @@ impl Insert for ValdImpl {
         &self,
         request: Request<payload::v1::insert::Request>,
     ) -> Result<Response<payload::v1::object::Location>, Status> {
-        let msg = request.get_ref();
-        let obj = match &msg.vector {
-            Some(o) => o,
-            None => return Err(Status::invalid_argument("vector is required.")),
-        };
-        let uuid = obj.id.clone();
-        let vector = obj.vector.clone();
-
-        match &self.ngt.lock().unwrap().insert(&uuid, vector){
-            Ok(_) => {
-                let reply = payload::v1::object::Location{
-                    name: "vald-agent-ngt-rs".to_string(),
-                    uuid,
-                    ips: vec!["192.168.1.1".to_string()],
-                };
-
-                Ok(Response::new(reply))
-            },
-            Err(err) => Err(Status::internal(err.to_string())),
+        match self.insert_impl(request.get_ref()) {
+            Ok(res) => Ok(Response::new(res)),
+            Err(err) => Err(err),
         }
     }
 
@@ -110,7 +119,34 @@ impl Insert for ValdImpl {
         &self,
         request: Request<Streaming<payload::v1::insert::Request>>,
     ) -> Result<Response<Self::StreamInsertStream>, Status> {
-        unimplemented!()
+        let mut stream = request.into_inner();
+        let (mut tx, rx) = mpsc::channel(4);
+        let vald = self.clone();
+
+        tokio::spawn(async move {
+            while let Some(req) = stream.message().await.unwrap() {
+                let reply = match vald.insert_impl(&req) {
+                    Ok(loc) => payload::v1::object::StreamLocation{
+                        payload: Some(payload::v1::object::stream_location::Payload::Location(loc)),
+                    },
+                    Err(st) => payload::v1::object::StreamLocation{
+                        payload: Some(payload::v1::object::stream_location::Payload::Error(errors::v1::errors::Rpc{
+                            r#type: "".to_string(),
+                            msg: "".to_string(),
+                            details: Vec::new(),
+                            error: st.to_string(),
+                            instance: "".to_string(),
+                            status: 0,
+                            roots: Vec::new(),
+                        })),
+                    },
+                };
+
+                tx.send(Ok(reply)).await.unwrap();
+            }
+        });
+
+        Ok(Response::new(rx))
     }
 
     async fn multi_insert(

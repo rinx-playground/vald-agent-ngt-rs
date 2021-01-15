@@ -28,7 +28,7 @@ async fn main() {
     env_logger::init();
 
     let addr = "0.0.0.0:8080".parse().unwrap();
-    let mut vald = ValdImpl::default();
+    let vald = ValdImpl::default();
 
     vald.initialize().unwrap();
 

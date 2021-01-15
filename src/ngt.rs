@@ -51,13 +51,6 @@ impl NGT {
     }
 
     pub fn insert(&mut self, id: &str, vec: Vec<f32>) -> Result<(), io::Error> {
-        let index = match &mut self.index {
-            Some(index) => index,
-            None => {
-                panic!("NGT index is not opened");
-            }
-        };
-
         self.insert_vecs
             .lock()
             .unwrap()

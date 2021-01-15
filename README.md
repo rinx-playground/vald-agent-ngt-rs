@@ -9,7 +9,7 @@ Current Status
 
 - Using Vald v1 APIs.
     - [X] Insert
-    - [ ] StreamInsert
+    - [X] StreamInsert
     - [X] Search
     - [ ] StreamSearch
     - [ ] SearchByID
