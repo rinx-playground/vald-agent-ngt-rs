@@ -11,7 +11,7 @@ Current Status
     - [X] Insert
     - [X] StreamInsert
     - [X] Search
-    - [ ] StreamSearch
+    - [X] StreamSearch
     - [ ] SearchByID
     - [ ] StreamSearchByID
     - [X] CreateIndex
