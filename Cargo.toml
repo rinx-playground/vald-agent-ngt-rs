@@ -20,3 +20,7 @@ env_logger = "0.8.2"
 
 [build-dependencies]
 tonic-build = "0.3"
+
+[[bin]]
+name = "vald-agent-ngt-rs"
+path = "src/main.rs"

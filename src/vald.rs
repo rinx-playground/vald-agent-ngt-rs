@@ -43,15 +43,15 @@ pub mod core {
     }
 }
 
-pub mod errors {
-    pub mod v1 {
-        tonic::include_proto!("errors.v1");
-    }
-}
-
 pub mod payload {
     pub mod v1 {
         tonic::include_proto!("payload.v1");
+    }
+}
+
+pub mod google {
+    pub mod rpc {
+        tonic::include_proto!("google.rpc");
     }
 }
 
@@ -155,14 +155,10 @@ impl Insert for ValdImpl {
                         payload: Some(payload::v1::object::stream_location::Payload::Location(loc)),
                     },
                     Err(st) => payload::v1::object::StreamLocation{
-                        payload: Some(payload::v1::object::stream_location::Payload::Error(errors::v1::errors::Rpc{
-                            r#type: "".to_string(),
-                            msg: "".to_string(),
+                        payload: Some(payload::v1::object::stream_location::Payload::Status(google::rpc::Status{
+                            code: 0,
+                            message: st.to_string(),
                             details: Vec::new(),
-                            error: st.to_string(),
-                            instance: "".to_string(),
-                            status: 0,
-                            roots: Vec::new(),
                         })),
                     },
                 };
@@ -218,14 +214,10 @@ impl Search for ValdImpl {
                         payload: Some(payload::v1::search::stream_response::Payload::Response(res)),
                     },
                     Err(st) => payload::v1::search::StreamResponse{
-                        payload: Some(payload::v1::search::stream_response::Payload::Error(errors::v1::errors::Rpc{
-                            r#type: "".to_string(),
-                            msg: "".to_string(),
+                        payload: Some(payload::v1::search::stream_response::Payload::Status(google::rpc::Status{
+                            code: 0,
+                            message: st.to_string(),
                             details: Vec::new(),
-                            error: st.to_string(),
-                            instance: "".to_string(),
-                            status: 0,
-                            roots: Vec::new(),
                         })),
                     },
                 };

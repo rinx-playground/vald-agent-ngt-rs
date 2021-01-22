@@ -46,7 +46,9 @@ target/release/vald-agent-ngt-rs: \
 
 proto: \
 	proto/github.com/envoyproxy/protoc-gen-validate \
-	proto/github.com/googleapis/googleapis
+	proto/github.com/gogo/protobuf \
+	proto/github.com/gogo/googleapis \
+	proto/github.com/protocolbuffers/protobuf
 
 proto/github.com/envoyproxy/protoc-gen-validate:
 	mkdir -p proto
@@ -54,11 +56,23 @@ proto/github.com/envoyproxy/protoc-gen-validate:
 	    https://github.com/envoyproxy/protoc-gen-validate \
 	    proto/github.com/envoyproxy/protoc-gen-validate
 
-proto/github.com/googleapis/googleapis:
+proto/github.com/gogo/protobuf:
 	mkdir -p proto
 	git clone --depth 1 \
-	    https://github.com/googleapis/googleapis \
-	    proto/github.com/googleapis/googleapis
+	    https://github.com/gogo/protobuf \
+	    proto/github.com/gogo/protobuf
+
+proto/github.com/gogo/googleapis:
+	mkdir -p proto
+	git clone --depth 1 \
+	    https://github.com/gogo/googleapis \
+	    proto/github.com/gogo/googleapis
+
+proto/github.com/protocolbuffers/protobuf:
+	mkdir -p proto
+	git clone --depth 1 \
+	    https://github.com/protocolbuffers/protobuf \
+	    proto/github.com/protocolbuffers/protobuf
 
 apis/proto/v1: \
 	proto \
