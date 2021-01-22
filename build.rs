@@ -5,7 +5,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .format(true)
         .compile(
             &[
-                "apis/proto/v1/errors/errors.proto",
                 "apis/proto/v1/payload/payload.proto",
                 "apis/proto/v1/vald/insert.proto",
                 "apis/proto/v1/vald/object.proto",
@@ -18,7 +17,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             &[
                 ".",
                 "proto",
-                "proto/github.com/googleapis/googleapis",
+                "proto/github.com/gogo/googleapis",
+                "proto/github.com/protocolbuffers/protobuf",
                 "apis/proto",
             ],
         )?;

@@ -11,6 +11,7 @@ futures = { version = "0.3", default-features = false }
 lazy_static = "1.4"
 prometheus = { version = "0.9", features = ["process"] }
 prost = "0.6"
+prost-types = "0.6"
 tokio = { version = "0.2", features = ["macros", "rt-threaded", "time"] }
 tonic = "0.3.1"
 warp = "0.2"
@@ -20,3 +21,7 @@ env_logger = "0.8.2"
 
 [build-dependencies]
 tonic-build = "0.3"
+
+[[bin]]
+name = "vald-agent-ngt-rs"
+path = "src/main.rs"

@@ -2001,6 +2001,7 @@ dependencies = [
  "ngt",
  "prometheus",
  "prost",
+ "prost-types",
  "tokio",
  "tonic",
  "tonic-build",
